@@ -50,13 +50,13 @@ class EmailController extends Controller
         $user->name = $request->input('name');
         $user->password = bcrypt($request->input('password'));
         $user->save();
-        $last_id = $user->id;
 
-        $token = $last_id.hash('sha256', Str::random(120));
+        $token = $user->id.hash('sha256', Str::random(120));
+        // $tokenbcript = bcrypt($user->id);
         $verifyURL = route('verify', ['token' => $token]);
 
         VerifyUser::create([
-            'user_id' => $last_id,
+            'user_id' => $user->id,
             'token' => $token
         ]);
 
@@ -64,6 +64,7 @@ class EmailController extends Controller
 
         $mail_data = [
             'recipient'=>$request->input('email'),
+            // recipient = Penerima
             'subject'=> 'Email Verify',
             'body'=> $message,
             'actionLink'=>$verifyURL
